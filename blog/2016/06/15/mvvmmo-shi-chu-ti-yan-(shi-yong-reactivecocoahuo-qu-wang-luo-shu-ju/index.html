@@ -1,0 +1,348 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>MVVM模式初体验（使用ReactiveCocoa获取网络数据) - voidxin</title>
+	<meta name="author" content="voidxin">
+
+	
+	<meta name="description" content="使用RAC也有一段时间了，由于此前的项目都是使用的MVC模式，网络请求都封装在固定的模块中，抽取出来十分不方便，所以到目前为止并没有涉及到使用RAC去做获取网络请求的情景。 近期，着手重构目前手上的项目，准备给臃肿的Controller瘦身，MVVM貌似是一个不错的选择（既然使用了RAC， &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="voidxin" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">voidxin</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	 <li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	 <li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:appleioscoder.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:appleioscoder.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">MVVM模式初体验（使用ReactiveCocoa获取网络数据)</h2>
+	<div class="entry-content"><p>使用RAC也有一段时间了，由于此前的项目都是使用的MVC模式，网络请求都封装在固定的模块中，抽取出来十分不方便，所以到目前为止并没有涉及到使用RAC去做获取网络请求的情景。</p>
+
+<p>  近期，着手重构目前手上的项目，准备给臃肿的Controller瘦身，MVVM貌似是一个不错的选择（既然使用了RAC，那为什么不使用MVVM呢?)。于是，开始上手体验MVVM模式和RAC的结合使用（RAC的基础知识在这就不介绍了，百度一下，一大推老司机都有分享）。不用不知道，一用才发现RAC和MVVM简直是绝配啊，那体验真是改变了我对编程的传统观念（函数响应式编程真心好用）。</p>
+
+<p>  这里用一个小demo来举例：</p>
+
+<p>  进入页面加载数据显示。这里使用我当前项目中的一个接口来模拟数据。既然是MVVM，那Model和ViewModel肯定是少不了的。如下：我们新建一个ViewModel叫LoadStoreViewModel(因为这里是加载商店数据),传统的MVC模式中，网络请求都是在ViewController中完成的，这里我们把网络请求封装到对应的ViewModel中去，能够有效的减少ViewController的负担，降低耦合性。</p>
+
+<p>  LoadStoreViewModel主要有三个属性：statues(网络加载状态），code1（编号），以及保存数据的数组dataArry，还有一个加载数据信号loadDataSignal；</p>
+
+<p> 初始化loadDataSignal：(主要进行网络请求）</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>//
+</span><span class='line'>- (RACSignal *)loadDataSignal{
+</span><span class='line'>    if (_loadDataSignal==nil) {
+</span><span class='line'>        AFHTTPRequestOperationManager *manager=[AFHTTPRequestOperationManager manager];
+</span><span class='line'>        manager.requestSerializer=[[AFJSONRequestSerializer alloc]init];
+</span><span class='line'>        NSDictionary *params=@{@"code1":@"MWG08A09"};
+</span><span class='line'>        _loadDataSignal=[manager rac_GET:kLoadURL parameters:params];
+</span><span class='line'>    }
+</span><span class='line'>    return _loadDataSignal;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>调用loadDataSignal处理网络请求结果：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>-(void)initWithSubscrible{
+</span><span class='line'>    [[self.loadDataSignal deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(RACTuple *jsonDataResult) {
+</span><span class='line'>        //请求成功，加载数据
+</span><span class='line'>        NSDictionary *tuple=[jsonDataResult objectAtIndex:0];
+</span><span class='line'>        NSArray *resultList=tuple[@"resultList"];
+</span><span class='line'>        if (resultList.count&gt;0) {
+</span><span class='line'>            self.dataArray=[[[resultList.rac_sequence
+</span><span class='line'>                              map:^id(NSDictionary *dataSource) {
+</span><span class='line'>                              NSDictionary *dic=[(NSDictionary *)dataSource mutableCopy];
+</span><span class='line'>                                  WGStoreModel *model=[WGStoreModel mj_objectWithKeyValues:dic];
+</span><span class='line'>                                  return model;
+</span><span class='line'>                            }] array] mutableCopy];
+</span><span class='line'>        }
+</span><span class='line'>    }];
+</span><span class='line'>    
+</span><span class='line'>    //请求失败
+</span><span class='line'>    [self.loadDataSignal subscribeError:^(NSError *error) {
+</span><span class='line'>       self.statues=@"没有网络，哈哈";
+</span><span class='line'>    }];
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ViewModel的操作完成，接下来要在Controller中绑定ViewModel
+绑定ViewModel，初始化，然后监听ViewModel中的网络请求状态，获得ViewMode中网络请求结果，在Controller中给出相应的提示，数据加载成功，显示数据刷新控件：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>-(void)bindViewModel{
+</span><span class='line'>    @weakify(self);
+</span><span class='line'>    self.storeViewModel=[[LoadStoreViewModel alloc]init];
+</span><span class='line'>    self.isLoading=YES;
+</span><span class='line'>    self.code1=kCode1;
+</span><span class='line'>    RAC(self.storeViewModel,code1)=RACObserve(self, code1);
+</span><span class='line'>    
+</span><span class='line'>    //加载状态
+</span><span class='line'>   [RACObserve(self, isLoading) subscribeNext:^(id x) {
+</span><span class='line'>        UIApplication.sharedApplication.networkActivityIndicatorVisible = [x boolValue];
+</span><span class='line'>   }];
+</span><span class='line'>    
+</span><span class='line'>    //加载网络数据成功
+</span><span class='line'>    [[[RACObserve(self.storeViewModel, dataArray) ignore:nil] doNext:^(id x) {
+</span><span class='line'>        self.isLoading=YES;
+</span><span class='line'>    }] subscribeNext:^(id x) {
+</span><span class='line'>        @strongify(self);
+</span><span class='line'>        self.isLoading=NO;
+</span><span class='line'>        //刷新控件--
+</span><span class='line'>        [self.tableView reloadData];
+</span><span class='line'>    }];
+</span><span class='line'>    
+</span><span class='line'>    //加载网络数据失败
+</span><span class='line'>    [[RACObserve(self.storeViewModel, statues) filter:^BOOL(id value) {
+</span><span class='line'>        //filter是过滤
+</span><span class='line'>        return value !=nil;
+</span><span class='line'>    }] subscribeNext:^(NSString *str) {
+</span><span class='line'>        UIAlertView *alertView=[[UIAlertView alloc]initWithTitle:@"提示" message:str delegate:self cancelButtonTitle:@"confirm" otherButtonTitles:nil, nil];
+</span><span class='line'>        [alertView show];
+</span><span class='line'>    }];
+</span><span class='line'>    
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ViewController中初始化TableView；</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- (UITableView *)tableView{
+</span><span class='line'>    if (!_tableView) {
+</span><span class='line'>        _tableView=[[UITableView alloc]initWithFrame:CGRectZero style:UITableViewStylePlain];
+</span><span class='line'>        _tableView.delegate=self;
+</span><span class='line'>        _tableView.dataSource=self;
+</span><span class='line'>        _tableView.showsVerticalScrollIndicator=NO;
+</span><span class='line'>        _tableView.rowHeight=49;
+</span><span class='line'>    }
+</span><span class='line'>    return _tableView;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>tableView的数据源和协议方法实现</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#pragma mark -tableView DataSource
+</span><span class='line'>- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+</span><span class='line'>    return 1;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+</span><span class='line'>    return [self.storeViewModel.dataArray count];
+</span><span class='line'>}
+</span><span class='line'>-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+</span><span class='line'>    static NSString *indefier=@"CELL";
+</span><span class='line'>    UITableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:indefier];
+</span><span class='line'>    if (!cell) {
+</span><span class='line'>        cell=[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:indefier];;
+</span><span class='line'>    }
+</span><span class='line'>    WGStoreModel *model=self.storeViewModel.dataArray[indexPath.row];
+</span><span class='line'>    cell.textLabel.text=model.shopName;
+</span><span class='line'>    
+</span><span class='line'>    return cell;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>无demo不文章，为了更好的理解本篇文章，请到我的github下载对应的demo，一运行探究竟(<a href="https://github.com/voidxin/ReactiveCocoaRequestData">https://github.com/voidxin/ReactiveCocoaRequestData</a>)</p>
+
+<p>谢谢。</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+Jun 15th, 2016</div>
+	<div class="tags">
+
+</div>
+	
+</div>
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    voidxin
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

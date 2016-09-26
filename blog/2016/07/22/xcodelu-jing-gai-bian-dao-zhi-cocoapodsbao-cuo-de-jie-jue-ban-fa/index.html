@@ -1,0 +1,167 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Xcode路径改变导致CocoaPods报错的解决办法 - voidxin</title>
+	<meta name="author" content="voidxin">
+
+	
+	<meta name="description" content="这几天心血来潮，更新了下Mac系统，然后装了下Xcode8装逼，接下来就懵逼了。 由于之前的Xcode是7.1的一直没升级，本想体验体验Xcode8的，所以装完Xcode8之后Xcode7.1也没有删掉，一直两个Xcode一起用着，用了几天之后觉得Xcode8挺稳定的，于是就删了Xcode7， &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="voidxin" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">voidxin</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	 <li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	 <li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:appleioscoder.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:appleioscoder.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">Xcode路径改变导致CocoaPods报错的解决办法</h2>
+	<div class="entry-content"><p>这几天心血来潮，更新了下Mac系统，然后装了下Xcode8装逼，接下来就懵逼了。</p>
+
+<p>由于之前的Xcode是7.1的一直没升级，本想体验体验Xcode8的，所以装完Xcode8之后Xcode7.1也没有删掉，一直两个Xcode一起用着，用了几天之后觉得Xcode8挺稳定的，于是就删了Xcode7，故事由此开始了。</p>
+
+<p>删了Xcode7的几天后，发现Xcode8 bug还是蛮多的，不是很稳定，并且大家都不怎么推荐这么早就使用Xcode8，于是忍痛割爱（要知道这可是我下了好几个小时才下下来的啊）把Xcode8删了准备用回Xcode7.1。于是我就从废纸篓里恢复了几天前删除了的Xcode7.1.庆幸竟然还能用（暗暗窃喜).</p>
+
+<p>今天由于要新增一个第三方，所以我很熟练的vim Podfile
+巴拉巴拉巴拉然后再 pod install，接下来就懵逼了。。。。</p>
+
+<p>报如下错误:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Setting up CocoaPods master repo
+</span><span class='line'>  $ /usr/bin/git remote set-url origin https://github.com/CocoaPods/Specs.git
+</span><span class='line'>  xcrun: error: active developer path ("/Applications/Xcode.app/Contents/Developer") does not exist, use `xcode-select --switch path/to/Xcode.app` to specify the Xcode that you wish to use for command line developer tools (or see `man xcode-select`)
+</span><span class='line'>  [!] Failed: /usr/bin/git remote set-url origin https://github.com/CocoaPods/Specs.git
+</span><span class='line'>  $ /usr/bin/git checkout master
+</span><span class='line'>  xcrun: error: active developer path ("/Applications/Xcode.app/Contents/Developer") does not exist, use `xcode-select --switch path/to/Xcode.app` to specify the Xcode that you wish to use for command line developer tools (or see `man xcode-select`)
+</span><span class='line'>  [!] Failed: /usr/bin/git checkout master
+</span><span class='line'>[!] Unable to add a source with url `https://github.com/CocoaPods/Specs.git` named `master-1`.
+</span><span class='line'>(The `master` repo is not a git repo.)
+</span><span class='line'>You can try adding it manually in `~/.cocoapods/repos` or via `pod repo add`.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>试了几次都不行，又换pod update还是不行，于是我开始怀疑是不是COcoaPods炸了，还是我升级了系统之后炸了。。。。想想不科学，应该是XCode的问题，仔细阅读错误（原谅我英文差），貌似看懂了那么一点，可能是我删了XCode又恢复导致的。就这么一百度果然还真是的。
+一句命令搞定：sudo xcode-select &ndash;switch /Applications/Xcode.app（后面的地址直接打开程序把Xcode往这里拖即可)。完事后再pod install。。biubiubiu出现了熟悉的“Analyzing dependencies”字样，最后提示“Pod installation complete! There are 15 dependencies from the Podfile and 16 total pods installed.”。ok成功了。</p>
+
+<p>以上记录我遇到的坑爹错误，给初次遇到这样问题的童鞋一点思路，不至于搓手不急（当时CocoaPods不能用我心中一万个草泥马崩腾啊）</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+Jul 22nd, 2016</div>
+	<div class="tags">
+
+</div>
+	
+</div>
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    voidxin
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

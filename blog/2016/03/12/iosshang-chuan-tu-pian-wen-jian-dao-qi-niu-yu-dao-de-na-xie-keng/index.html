@@ -1,0 +1,152 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>iOS上传图片文件到七牛遇到的那些坑 - voidxin</title>
+	<meta name="author" content="voidxin">
+
+	
+	<meta name="description" content="最近公司的项目涉及到图片的保存，基于大量图片放在本地服务器会给公司增加不小的压力，所以选择了云存储，对比之后选择了七牛。 七牛的官方文档实在是太过于简单，下载SDK之后，根据官方 给的Demo，成功上传了图片。只是token的生成过程有些波折。 由于七牛官方不提倡在客户端生成Token， &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="voidxin" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">voidxin</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	 <li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	 <li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:appleioscoder.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:appleioscoder.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">iOS上传图片文件到七牛遇到的那些坑</h2>
+	<div class="entry-content"><p>最近公司的项目涉及到图片的保存，基于大量图片放在本地服务器会给公司增加不小的压力，所以选择了云存储，对比之后选择了七牛。</p>
+
+<p>  七牛的官方文档实在是太过于简单，下载SDK之后，根据官方 给的Demo，成功上传了图片。只是token的生成过程有些波折。</p>
+
+<p>由于七牛官方不提倡在客户端生成Token，所以没有给出相应的iOS端生成Token的代码。多方查找资料之后自己写了一个本地生成Token的方法如下：</p>
+
+<p>有了token之后就引入SDK，如下操作即可实现上传：</p>
+
+<p>一开始很纳闷，从放回信息中没有找到我们上传成功之后需要的图片的外链接地址，查阅官方文档之后才明白外链接地址需要我们自己拼接。首先，成功之后返回的resp是：</p>
+
+<p>resp {</p>
+
+<pre><code>          hash = "FhweZwfJipE4P0K6Mm_QbC6P0dxW";
+
+          key = zx12;
+</code></pre>
+
+<p>}</p>
+
+<p>如果失败resp为nil，所以图片的外链接地址就是你的 域名/key(返回的key)</p>
+
+<p>此demo下载地址：<a href="https://github.com/voidxin/UploadImageToQiniu">https://github.com/voidxin/UploadImageToQiniu</a></p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+Mar 12th, 2016</div>
+	<div class="tags">
+
+</div>
+	
+</div>
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    voidxin
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>
